@@ -160,9 +160,17 @@ namespace Xunit.Sdk
             if (obj == null)
                 return null;
 
-            if (obj is Task task)
-                return task;
+            return GetTaskFrom((dynamic)obj);
+        }
 
+        private static Task GetTaskFrom(Task task) => task;
+
+        private static Task GetTaskFrom(ValueTask valueTask) => valueTask.AsTask();
+
+        private static Task GetTaskFrom<T>(ValueTask<T> valueTask) => valueTask.AsTask();
+
+        private static Task GetTaskFrom(object obj)
+        {
             var type = obj.GetType();
             if (type.IsGenericType() && type.GetGenericTypeDefinition().FullName == "Microsoft.FSharp.Control.FSharpAsync`1")
             {
